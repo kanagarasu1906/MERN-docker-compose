@@ -1,0 +1,54 @@
+name: security-Quality scanning.
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  
+
+jobs:
+  secret-scan:
+    name: Secret Scan with Gitleaks
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Gitleaks
+        uses: gitleaks/gitleaks-action@v2
+
+  codeql:
+    name: CodeQL Scan
+    runs-on: ubuntu-latest
+    #needs: secret-scan
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: javascript  # Modify as per your codebase
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+
+  
+  trivy:
+    name: Trivy Scan
+    runs-on: ubuntu-latest
+    #needs: sonarqube
+
+    steps:
+      - name: Trivy scan - Filesystem
+        uses: aquasecurity/trivy-action@master
+        with:
+         scan-type: 'fs'
+         scan-ref: '.'  
