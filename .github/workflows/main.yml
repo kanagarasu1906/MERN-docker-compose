@@ -52,3 +52,35 @@ jobs:
         with:
          scan-type: 'fs'
          scan-ref: '.'  
+
+  notify:
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set status message
+        id: set-status
+        run: |
+          if [ "${{ job.status }}" = "success" ]; then
+            echo "SUBJECT=✅ Build Success" >> $GITHUB_ENV
+          else
+            echo "SUBJECT=❌ Build Failed" >> $GITHUB_ENV
+          fi
+
+      - name: Send Outlook Email Notification
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.office365.com
+          server_port: 587
+          secure: true
+          username: ${{ secrets.EMAIL_USERNAME }}
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          subject: ${{ env.SUBJECT }}
+          to: kanagarasu.s@sq1.security
+          from: GitHub CI <${{ secrets.EMAIL_USERNAME }}>
+          body: |
+            Hello,
+
+            Your GitHub Actions workflow has completed.
+
+            • Status: ${{ job.status }}
+
