@@ -2,7 +2,10 @@ name: security-Quality scanning.
 
 on:
   push:
-    branches: [ "master" ]
+    branches:
+      -  master
+      -  dev
+      - uat
   pull_request:
     branches: [ "master" ]
   
