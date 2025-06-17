@@ -25,6 +25,6 @@ jobs:
 
       - name: Run Snyk test
         run: snyk test
-        working-directory: ./frontend   # 👉 adjust to match your project
+        working-directory: ./mern/frontend   # 👉 adjust to match your project
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
