@@ -18,7 +18,7 @@ jobs:
 
       - name: Install dependencies
         run: npm install --legacy-peer-deps
-        working-directory: ./frontend   # 👉 adjust to match your project
+        working-directory: mern/frontend   # 👉 adjust to match your project
 
       - name: Install Snyk CLI
         run: npm install -g snyk
