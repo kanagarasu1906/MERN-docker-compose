@@ -7,6 +7,9 @@ jobs:
   security:
     runs-on: ubuntu-latest
 
+    permissions:
+      security-events: write  # Required for uploading SARIF
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -23,14 +26,13 @@ jobs:
       - name: Install Snyk CLI
         run: npm install -g snyk
 
-      - name: Run Snyk test and generate JSON report
-        run: snyk test --json > snyk-report.json
+      - name: Run Snyk test and generate SARIF report
+        run: snyk test --sarif > snyk.sarif
         working-directory: ./mern/frontend
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
-      - name: Upload Snyk report as artifact
-        uses: actions/upload-artifact@v4
+      - name: Upload SARIF report to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v2
         with:
-          name: snyk-vulnerability-report
-          path: ./mern/frontend/snyk-report.json
+          sarif_file: ./mern/frontend/snyk.sarif
