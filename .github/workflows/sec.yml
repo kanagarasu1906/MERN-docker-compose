@@ -1,13 +1,36 @@
-name: Example workflow for Node using Snyk
-on: push
+name: Node Snyk Workflow
+
+on:
+  push:
+
 jobs:
   security:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@master
-      - name: Run Snyk to check for vulnerabilities
-        uses: snyk/actions/node@master
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm install --legacy-peer-deps
+        working-directory: ./mern/frontend
+
+      - name: Install Snyk CLI
+        run: npm install -g snyk
+
+      - name: Run Snyk test and generate JSON report
+        run: snyk test --json > snyk-report.json
+        working-directory: ./mern/frontend
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+
+      - name: Upload Snyk report as artifact
+        uses: actions/upload-artifact@v4
         with:
-          args: --severity-threshold=high
+          name: snyk-vulnerability-report
+          path: ./mern/frontend/snyk-report.json
